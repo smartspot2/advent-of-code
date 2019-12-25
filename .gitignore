@@ -70,3 +70,10 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+
+# Excluded files from workspace
+/2019/__init__.py
+/2019/day24p2_vis.py
+/2019/day24vis.mp4
+/2019/IntCode/IntCode_nodebug.py
+/2019/IntCode/IntCode_old.py
