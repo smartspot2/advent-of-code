@@ -43,4 +43,4 @@ print(part2())
 
 # session.submit(part1(), part=2)
 
-getids_short = lambda: (lambda t: [int(l[:7].translate(t), 2) * 8 + int(l[-3:].translate(t), 2) for l in data])(str.maketrans('FBLR', '0101'))
+getids_short = lambda: [int(l.translate(str.maketrans('FBLR', '0101')), 2) for l in data]
