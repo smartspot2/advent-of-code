@@ -78,3 +78,5 @@ fabric.properties
 /2019/IntCode/IntCode_nodebug.py
 /2019/IntCode/IntCode_old.py
 /common/session/cookie.py
+*.out*
+*.in
