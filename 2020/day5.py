@@ -43,4 +43,4 @@ print(part2())
 
 # session.submit(part1(), part=2)
 
-getids_short = lambda: [int(l.translate(str.maketrans('FBLR', '0101')), 2) for l in data]
+(lambda d: print(max(d), *set(range(min(d), max(d))) - d))({int(l.translate(str.maketrans('FBLR', '0101')), 2) for l in data})
