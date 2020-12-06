@@ -9,29 +9,19 @@ from common.session import AdventSession
 session = AdventSession(day=, year=)
 data = session.data.strip()
 data = data
+# data = data.split('\n')
 # data = list(map(int, data.split()))
 
+p1, p2 = 0, 0
 
-def part1():
-    out = 0
-    for i, val in enumerate(data):
-        pass
-    return out
+for i, val in enumerate(data):
+    pass
 
 
-# print(part1())
+print(f'Part 1: {p1}')
+print(f'Part 2: {p2}')
 
+# session.submit(p1, part=1)
+# session.submit(p2, part=2)
 
-def part2():
-    out = 0
-    for i, val in enumerate(data):
-        pass
-    return out
-
-
-# print(part2())
-
-# session.submit(part1(), part=1)
-# session.submit(part2(), part=2)
-
-# session.submit(part1(), part=2)
+# session.submit(p1, part=2)
