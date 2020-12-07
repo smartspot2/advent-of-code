@@ -14,7 +14,7 @@ data = data
 
 p1, p2 = 0, 0
 
-for i, val in enumerate(data):
+for i, line in enumerate(data):
     pass
 
 
