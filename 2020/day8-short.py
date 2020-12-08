@@ -1,11 +1,11 @@
-(lambda f,d:print(-f(f,d),max(f(f,d[:i]+['nj'['n'in v]]+d[i+1:])for i,v in enumerate(d)if 1-i%2)))(lambda f,d,i=0,a=0,v=[]:(-(i in v)|(i>=len(d)))*a or f(f,d,i+2*(1,(n:=int(d[i+1])))['j'in d[i]],a+n*('a'in d[i]),v+[i]),open('i').read().split())
+(lambda f,d:print(-f(f,d),max(f(f,d[:i]+['nj'['n'in v]]+d[i+1:])for i,v in enumerate(d)if~i%2)))(lambda f,d,i=0,a=0,v=[]:(-(i in v)|(i>=len(d)))*a or f(f,d,i+2*(1,(n:=int(d[i+1])))['j'in d[i]],a+n*('a'in d[i]),v+[i]),open('i').read().split())
 
 (lambda f, d: print(                                # prints (part 1, part 2)
     -f(f, d),                                       # negative = infinite loop, positive = normal exit
     max(                                            # max to get the most positive value
         f(f, d[:i] + ['nj'['n' in v]] + d[i + 1:])  # swap jmp and nop at index i
         for i, v in enumerate(d)                    # iterate through all possible swaps
-        if 1 - i % 2)))(                            # only take indices of instructions
+        if ~i % 2)))(                               # only take indices of instructions
     lambda f, d, i=0, a=0, v=[]:                    # recursive function for execution of program
     (-(i in v)                                      # if index visited, this is -1
      | (i >= len(d)))                               # if index out of bounds, this is 1
