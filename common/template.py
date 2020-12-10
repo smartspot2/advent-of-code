@@ -2,6 +2,7 @@ import numpy as np
 # import networkx as nx
 from collections import *
 from itertools import *
+from functools import *
 import re
 
 from common.session import AdventSession
