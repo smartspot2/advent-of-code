@@ -3,6 +3,7 @@ import numpy as np
 from collections import *
 from itertools import *
 from functools import *
+import math
 import re
 
 from common.session import AdventSession
