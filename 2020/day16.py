@@ -31,7 +31,7 @@ for field in raw_fields:
 all_values = sum(othertickets, [])
 
 invalid = [val for val in all_values
-           if all(val not in field[1] and val not in field[2]
+           if all(val not in field[0] and val not in field[1]
                   for field in fields.values())]
 p1 = sum(invalid)
 
@@ -41,7 +41,7 @@ pos = defaultdict(list)
 
 for i, group in enumerate(zip(*othertickets)):
     for name, field in fields.items():
-        if all(v in field[1] or v in field[2] for v in group):
+        if all(v in field[0] or v in field[1] for v in group):
             pos[i].append(name)
 
 while any(len(f) > 1 for f in pos.values()):
