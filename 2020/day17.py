@@ -17,45 +17,45 @@ def setup(dim):
     adj = [*product(range(-1, 2), repeat=dim)]
     adj.remove((0,) * dim)
 
-    b = defaultdict(int)
+    b = set()
     for i, row in enumerate(data):
         for j, el in enumerate(row):
-            b[(i, j, *(0,) * (dim - 2))] = el == '#'
+            if el == '#':
+                b.add((i, j, *(0,) * (dim - 2)))
     return b, adj
 
 
-def getnext(b, adj, *coord):
-    occ = 0
-    for diff in adj:
-        if b[(*map(sum, zip(coord, diff)),)]:
-            occ += 1
-    return (b[coord] and occ in (2, 3)) or (not b[coord] and occ == 3)
+def getnext(b, adj, coord):
+    occ = sum((*map(sum, zip(coord, diff)),) in b for diff in adj)
+    return (coord in b and occ in (2, 3)) or (coord not in b and occ == 3)
 
 
 def simulate(b, adj):
-    newb = defaultdict(int)
+    newb = set()
     visited = set()
-    for coord in list(b.keys()):
-        newb[coord] = getnext(b, adj, *coord)
-        visited.add(coord)
+    for coord in b:
+        if coord not in visited:
+            if getnext(b, adj, coord):
+                newb.add(coord)
+            visited.add(coord)
         for diff in adj:
             new = (*map(sum, zip(coord, diff)),)
-            if new in visited:
-                continue
-            newb[new] = getnext(b, adj, *new)
-            visited.add(new)
+            if new not in visited:
+                if getnext(b, adj, new):
+                    newb.add(new)
+                visited.add(new)
     return newb
 
 
 board, ADJ = setup(3)
 for _ in range(6):
     board = simulate(board, ADJ)
-p1 = sum(board.values())
+p1 = len(board)
 
 board, ADJ = setup(4)
 for _ in range(6):
     board = simulate(board, ADJ)
-p2 = sum(board.values())
+p2 = len(board)
 
 print(f'Part 1: {p1}')
 print(f'Part 2: {p2}')
