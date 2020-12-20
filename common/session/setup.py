@@ -73,7 +73,7 @@ class AdventSession:
         par = article.find_next('p')
         text = par.getText()
 
-        wait_match = re.search(r'You have (\d+) left to wait', text)
+        wait_match = re.search(r'You have (\d+)s left to wait', text)
         output = ''
         if wait_match:
             print(f'You have {wait_match.group(1)}s left to wait!')
