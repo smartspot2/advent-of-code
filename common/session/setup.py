@@ -15,6 +15,7 @@ class AdventSession:
         self.session = requests.Session()
         self.session.cookies.update({'session': cookie})
         self.data = self.setup_session()
+        self.test_data = self.get_test_data()
 
     def setup_session(self):
         filename = f'day{self.day}.in'
@@ -33,6 +34,12 @@ class AdventSession:
             with open(filename, 'r') as input_file:
                 data = input_file.read()
         return data
+
+    def get_test_data(self):
+        if os.path.exists(f'day{self.day}.test'):
+            with open(f'day{self.day}.test', 'r') as test_file:
+                data = test_file.read()
+            return data
 
     def submit(self, answer, part):
         """

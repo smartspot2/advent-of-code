@@ -10,8 +10,8 @@ from common.session import AdventSession
 
 session = AdventSession(day=, year=)
 data = session.data.strip()
-data = data
-# data = data.split('\n')
+# data = session.test_data.strip()
+data = data.split('\n')
 # data = list(map(int, data.split()))
 
 p1, p2 = 0, 0

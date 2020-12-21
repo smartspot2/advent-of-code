@@ -80,3 +80,4 @@ fabric.properties
 /common/session/cookie.py
 *.out*
 *.in
+*.test
