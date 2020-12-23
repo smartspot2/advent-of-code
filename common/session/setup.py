@@ -3,6 +3,7 @@ import os.path
 import requests
 import bs4
 import re
+from time import perf_counter
 from rich.console import Console
 
 from .cookie import cookie
@@ -22,6 +23,7 @@ class AdventSession:
         self.console = Console(color_system='auto')
         self.data = self.setup_session()
         self.test_data = self.get_test_data()
+        self.start_time = perf_counter()
 
     def setup_session(self) -> str:
         """Creates .in file if it doesn't exist, otherwise reads from it."""
@@ -208,3 +210,17 @@ class AdventSession:
                 '\n'.join(f'[{response}\t]\t{answer}'
                           for answer, response in
                           zip(answers, pretty_responses)))
+
+    def reset_start_time(self) -> None:
+        """Reset the stored start time."""
+        self.start_time = perf_counter()
+
+    def get_elapsed(self) -> float:
+        """Retrieve the elapsed time since last stored start time."""
+        return perf_counter() - self.start_time
+
+    def print_elapsed(self) -> None:
+        """Pretty print the elapsed time."""
+        self.console.print(
+            f'{self.get_elapsed()} seconds have elapsed.'
+        )
