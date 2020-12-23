@@ -13,17 +13,8 @@ data = session.data.strip()
 data = list(map(int, data))
 
 
-class Node:
-    def __init__(self, val):
-        self.val = val
-        self.nxt = None
-
-    def __repr__(self):
-        return repr(self.val)
-
-
 def simulate(moves, max_val=None):
-    nodes = {}
+    nxt = {}
 
     if max_val:
         # chain to prevent creation of lorge array
@@ -32,41 +23,36 @@ def simulate(moves, max_val=None):
         max_val = max(data)
         d = iter(data)
 
-    cur = Node(next(d))
-    nodes[1] = cur
+    cur = next(d)
     for i in d:
-        nxt = Node(i)
-        cur.nxt, nodes[i] = nxt, nxt
-        cur = nxt
-    cur.nxt = nodes[1]
+        nxt[cur], cur = i, i
+    nxt[cur] = data[0]
 
-    cur = nodes[1]
+    cur = data[0]
     for move in range(moves):
-        pick = cur.nxt
-        pick_end = pick.nxt.nxt
-        dest = cur.val - 1 if cur.val != 1 else max_val
-        while dest in (pick.val, pick.nxt.val, pick_end.val):
+        pick = nxt[cur]
+        pick_end = nxt[nxt[pick]]
+        dest = cur - 1 if cur != 1 else max_val
+        while dest in (pick, nxt[pick], pick_end):
             dest = dest - 1 if dest > 1 else max_val
-        dest_node = nodes[dest]
 
-        dest_node.nxt, pick_end.nxt, cur.nxt = \
-            pick, dest_node.nxt, pick_end.nxt
+        nxt[dest], nxt[pick_end], nxt[cur] = \
+            pick, nxt[dest], nxt[pick_end]
 
-        cur = cur.nxt
-
-    return nodes[1]
+        cur = nxt[cur]
+    return nxt
 
 
 p1 = ''
-tmp = simulate(100)
-for _ in range(len(data)):
-    p1 += str(tmp.val)
-    tmp = tmp.nxt
-p1 = p1[1:]
+link = simulate(100)
+tmp = 1
+for _ in range(len(data) - 1):
+    p1 += str(link[tmp])
+    tmp = link[tmp]
 print(f'Part 1: {p1}')
 
-one = simulate(10_000_000, max_val=1_000_000)
-p2 = one.nxt.val * one.nxt.nxt.val
+link = simulate(10_000_000, max_val=1_000_000)
+p2 = link[1] * link[link[1]]
 print(f'Part 2: {p2}')
 
 # session.submit(p1, part=1)
