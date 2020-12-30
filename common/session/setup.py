@@ -1,9 +1,10 @@
-from typing import List, Tuple
 import os.path
-import requests
-import bs4
 import re
 from time import perf_counter
+from typing import List, Tuple
+
+import bs4
+import requests
 from rich.console import Console
 
 from .cookie import cookie
@@ -75,40 +76,14 @@ class AdventSession:
         """
         self.console.print(f'Submitting [yellow bold]{answer}[/yellow bold] '
                            f'for part {part}...')
-        answer_list, response_list = self.parse_past_submissions(part)
-        if 'right' in response_list:
-            idx = response_list.index('right')
-            right_answer = answer_list[idx]
-            postfix = '(This guess is [red]incorrect[/red])'
-            if str(answer) == str(right_answer):
-                postfix = '(This guess is [green]correct[/green])'
-            self.console.print(
-                f'Part {part} was already submitted with the right answer of '
-                f'[bold green]{right_answer}[/bold green]!', postfix)
+        if self.check_already_submitted(answer, part):
             return ''
-        elif str(answer) in answer_list:
-            self.console.print(f'You already submitted [bold]{answer}[/bold]!')
-            verb = self.get_verbose(
-                dict(zip(answer_list, response_list))[str(answer)])
-            if verb:
-                self.console.print(verb)
+        if self.console.input(
+                f'(Press [bold]ENTER[/bold] to continue, '
+                f'or write anything to cancel) '):
             return ''
-        inp = self.console.input(
-            f'(Press [bold]ENTER[/bold] to continue, '
-            f'or write anything to cancel) ')
-        if inp:
-            return ''
-        response = self.session.post(
-            f'https://adventofcode.com/{self.year}/day/{self.day}/answer',
-            {'level': part, 'answer': answer}
-        )
-        page = response.text
-        parsed = bs4.BeautifulSoup(page, 'html.parser')
-        article = parsed.find('article')
-        if article is None:
-            return page
-        par = article.find_next('p')
-        text = par.getText()
+
+        text = self._post(answer, part)  # send post request
 
         wait_match = re.search(r'You have (\d+)s left to wait', text)
         output = ''
@@ -128,18 +103,96 @@ class AdventSession:
             self.console.print(prefix, f"is [bold green]correct[/bold green]!")
             output = 'right'
         elif "You don't seem to be solving the right level" in text:
-            self.console.print(f"Part {part} was already submitted!")
+            wrote_answer = self.retrieve_answer(part)
+            if wrote_answer:  # print response
+                self.check_already_submitted(answer, part)
+            else:
+                self.console.print(f"Part {part} was already submitted!")
         if output:
             self.add_submission(answer, output, part)
             if output != 'right':
                 self.console.print(f'Past responses for part {part}:')
                 self.print_past_submissions(part)
+        # print(text)  # TODO: add leaderboard positions
         return text
 
     def add_submission(self, answer, response, part: int) -> None:
         """Adds a submission to the day and part's .out file."""
         with open(f'day{self.day}.out{part}', 'a') as f:
             f.write(f'[{response}\t]\t{answer}\n')
+
+    def check_already_submitted(self, answer, part):
+        """
+        Checks whether the answer has already been submitted,
+        or if the part has already been answered.
+
+        :param answer: answer to check
+        :param part: part to check
+        :return: whether the answer has already been submitted
+        """
+        answer_list, response_list = self.parse_past_submissions(part)
+        if 'right' in response_list:
+            # find correct answer and print it
+            idx = response_list.index('right')
+            right_answer = answer_list[idx]
+            postfix = '(This guess is [red]incorrect[/red])'
+            if str(answer) == str(right_answer):  # check current answer
+                postfix = '(This guess is [green]correct[/green])'
+            self.console.print(
+                f'Part {part} was already submitted with the right answer of '
+                f'[bold green]{right_answer}[/bold green]!', postfix)
+        elif str(answer) in answer_list:
+            self.console.print(f'You already submitted [bold]{answer}[/bold]!')
+            verb = self.get_verbose(
+                dict(zip(answer_list, response_list))[str(answer)])
+            if verb:
+                self.console.print(verb)
+        else:
+            return False
+        return True
+
+    def _post(self, answer, part: int):
+        """
+        Sends a post request, returning the raw text response.
+
+        :param answer: answer to submit
+        :param part: part to submit to
+        :return: raw text of response
+        """
+        response = self.session.post(
+            f'https://adventofcode.com/{self.year}/day/{self.day}/answer',
+            {'level': part, 'answer': answer}
+        )
+        page = response.text
+        parsed = bs4.BeautifulSoup(page, 'html.parser')
+        article = parsed.find('article')
+        if article is None:
+            return page
+        par = article.find_next('p')
+        return par.getText()
+
+    def retrieve_answer(self, part: int):
+        """Retrieves displayed answer from problem webpage."""
+        with self.console.status('Retrieving answer from site...'):
+            response = self.session.get(
+                f'https://adventofcode.com/{self.year}/day/{self.day}'
+            )
+            page = response.text
+            parsed = bs4.BeautifulSoup(page, 'html.parser')
+            if part == 2:
+                part2_h2 = parsed.find(attrs={'id': 'part2'})
+                ans_par = part2_h2.parent.find_next_sibling()
+            else:  # part 1
+                description = parsed.find(class_='day-desc')
+                ans_par = description.find_next_sibling()
+            ans = ans_par.find('code').text
+        if not ans:
+            self.console.print('Answer could not be retrieved!')
+            return False
+        with self.console.status('Writing answer to file...'):
+            with open(f'day{self.day}.out{part}', 'a') as f:
+                f.write(f'[right\t]\t{ans}\n')
+        return True
 
     def get_past_submissions(self, part: int) -> List[str]:
         """Retrieves past submissions for the day and part."""
