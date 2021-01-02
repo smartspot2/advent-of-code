@@ -1,0 +1,46 @@
+#!/usr/bin/env python3.9
+
+import argparse
+import os
+import sys
+from datetime import datetime
+
+import IPython
+from rich.console import Console
+
+console = Console(highlight=False)
+now = datetime.now()
+cur_year = now.year
+cur_day = now.day
+
+parser = argparse.ArgumentParser(
+    prog='aoc', description='CLI to run AOC solutions'
+)
+
+parser.add_argument(
+    '-year', type=int, nargs='?', default=cur_year,
+    help="Year of AOC to run")
+parser.add_argument(
+    '-day', type=int, nargs='?', default=cur_day,
+    help="Day of AOC to run")
+parser.add_argument(
+    '-interactive', action='store_true',
+    help="Open IPython console after program finishes"
+)
+
+args = parser.parse_args()
+
+aoc_file = f'day{args.day}.py'
+
+if not os.path.exists(f'{args.year}/' + aoc_file):  # file not found
+    console.print(f'AOC {args.year} day {args.day} not found!', style='red')
+else:  # file found
+    aoc_common = os.path.abspath('common')
+    os.chdir(f'{args.year}')
+    sys.path.append(aoc_common)
+    ipython_argv = ['--no-banner', '--quick', f'{aoc_file}']
+    if args.interactive:
+        ipython_argv.insert(1, '-i')
+    console.print(f'Running AOC {args.year} day {args.day}...\n',
+                  style='italic #888888')
+    IPython.start_ipython(argv=ipython_argv)
