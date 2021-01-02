@@ -1,5 +1,5 @@
 from common.session import AdventSession
-from common.utils.numpy import str_to_array
+from common.utils.numpy_utils import str_to_array
 
 session = AdventSession(day=22, year=2017)
 data = session.data.strip()
